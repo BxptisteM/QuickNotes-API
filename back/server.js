@@ -1,16 +1,18 @@
-const express = require('express');
-const mongoose = require('mongoose');
-const dotenv = require('dotenv');
+import express, { json } from 'express';
+import { connect } from 'mongoose';
+import { config } from 'dotenv';
 
-dotenv.config();
+import userRoutes from './routes/userRoutes.js';
 
+config();
 const app = express();
+const PORT = process.env.PORT || 5000;
 
-app.use(express.json());
+app.use(json());
 
 const connectDB = async () => {
     try {
-        await mongoose.connect(process.env.MONGO_URI, {
+        await connect(process.env.MONGO_URI, {
             useNewUrlParser: true,
             useUnifiedTopology: true
         });
@@ -23,11 +25,11 @@ const connectDB = async () => {
 
 connectDB();
 
+app.use('/api/users', userRoutes);
+
 app.get('/', (req, res) => {
     res.send('Hello World!');
 });
-
-const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
