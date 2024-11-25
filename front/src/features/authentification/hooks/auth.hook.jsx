@@ -71,10 +71,15 @@ import React, {
   };
 
   export const useAuth = () => {
-    const context = useContext(AuthContext);
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const [loading, setLoading] = useState(true);
 
-    if (!context) {
-      throw new Error("useAuth must be used within an AuthProvider");
-    }
-    return context;
+    useEffect(() => {
+      const token = localStorage.getItem("token");
+      setIsAuthenticated(!!token);
+      setLoading(false);
+    }, []);
+
+    return { isAuthenticated, loading };
   };
+

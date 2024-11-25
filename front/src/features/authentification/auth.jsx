@@ -33,6 +33,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 import { getApiClient } from "@/common/api/client";
+import { useNavigate } from "react-router-dom"
 
 const loginSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -69,6 +70,8 @@ export function AuthPage() {
 
   const apiClient = getApiClient()
 
+  const navigate = useNavigate()
+
   const submitLogin = async (values) => {
     try {
       console.log("Attempting to log in with:", values);
@@ -80,7 +83,9 @@ export function AuthPage() {
         const data = await response.json();
         if (data.token) {
           localStorage.setItem("token", data.token);
+          console.log(data.token);
           console.log("Logged in successfully");
+          window.location.href = "/notes";
         } else {
           console.error("No token received from the server");
         }
@@ -117,6 +122,7 @@ export function AuthPage() {
           if (data.token) {
             localStorage.setItem("token", data.token);
             console.log("Logged in successfully after user creation");
+            window.location.href = "/notes";
           } else {
             console.error("No token received after user creation");
           }
