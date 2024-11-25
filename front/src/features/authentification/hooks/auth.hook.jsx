@@ -40,8 +40,6 @@ import React, {
             localStorage.removeItem(accessTokenKey);
             setIsAuthenticated(false);
           }
-        } else {
-          console.log("No token found in localStorage");
         }
 
         setLoading(false);

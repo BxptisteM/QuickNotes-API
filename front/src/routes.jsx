@@ -1,7 +1,7 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from '@/features/authentification/hooks/auth.hook.jsx';
 import { AuthPage } from '@/features/authentification/auth.jsx';
-import { NotesPage } from '@/features/notes/notes.jsx'; // Assurez-vous que ce composant existe
+import NotesPage  from '@/features/notes/notes.jsx';
 
 export const AppRoutes = () => {
   const { isAuthenticated, loading } = useAuth();

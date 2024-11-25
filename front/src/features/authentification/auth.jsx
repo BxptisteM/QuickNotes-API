@@ -86,8 +86,6 @@ export function AuthPage() {
           console.log(data.token);
           console.log("Logged in successfully");
           window.location.href = "/notes";
-        } else {
-          console.error("No token received from the server");
         }
       } else {
         console.error("Failed to log in:", response.status, response.statusText);
