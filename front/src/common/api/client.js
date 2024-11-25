@@ -2,7 +2,7 @@ import { accessTokenKey } from "@/common/constants/auth";
 
 class ApiClient {
   constructor(baseURL) {
-    this.baseURL = baseURL;
+    this.baseURL = baseURL.endsWith("/") ? baseURL : `${baseURL}/`
     this.accessToken = null;
   }
 
@@ -80,7 +80,7 @@ class ApiClient {
 
 export function getApiClient() {
   const token = localStorage.getItem(accessTokenKey);
-  const apiClient = new ApiClient("http://localhost:3000");
+  const apiClient = new ApiClient("http://localhost:5000");
   if (token) {
     apiClient.setAccessToken(token);
   }

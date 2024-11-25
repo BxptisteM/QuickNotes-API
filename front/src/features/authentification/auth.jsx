@@ -32,6 +32,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
+import { getApiClient } from "@/common/api/client";
 
 const loginSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -39,7 +40,6 @@ const loginSchema = z.object({
 })
 
 const signUpSchema = loginSchema.extend({
-  name: z.string().min(2, "Name must be at least 2 characters"),
   username: z.string().min(3, "Username must be at least 3 characters"),
 })
 
@@ -56,7 +56,7 @@ export function AuthPage() {
     defaultValues: {
       email: "",
       password: "",
-      ...(isLogin ? {} : { name: "", username: "" }),
+      ...(isLogin ? {} : { username: "" }),
     },
   })
 
@@ -67,8 +67,77 @@ export function AuthPage() {
     },
   })
 
+  const apiClient = getApiClient()
+
+  const submitLogin = async (values) => {
+    try {
+      console.log("Attempting to log in with:", values);
+      const response = await apiClient.post("api/auth/login", {
+        email: values.email,
+        password: values.password,
+      });
+      if (response.status === 200 || response.status === 201) {
+        const data = await response.json();
+        if (data.token) {
+          localStorage.setItem("token", data.token);
+          console.log("Logged in successfully");
+        } else {
+          console.error("No token received from the server");
+        }
+      } else {
+        console.error("Failed to log in:", response.status, response.statusText);
+      }
+    } catch (error) {
+      console.error("An error occurred during login:", error.message || error);
+    }
+  };
+
+  const submitUserCreation = async (values) => {
+    try {
+      console.log("Creating user with values:", values);
+
+      const response = await apiClient.post("api/users/register", {
+        email: values.email,
+        password: values.password,
+        name: values.name,
+        surname: values.surname,
+        username: values.username.startsWith("@") ? values.username : "@" + values.username,
+      });
+
+      if (response.status === 201) {
+        console.log("User created successfully. Logging in...");
+
+        const responseLogin = await apiClient.post("api/auth/login", {
+          email: values.email,
+          password: values.password,
+        });
+
+        if (responseLogin.status === 200 || responseLogin.status === 201) {
+          const data = await responseLogin.json();
+          if (data.token) {
+            localStorage.setItem("token", data.token);
+            console.log("Logged in successfully after user creation");
+          } else {
+            console.error("No token received after user creation");
+          }
+        } else {
+          console.error("Login failed after user creation:", responseLogin.status, responseLogin.statusText);
+        }
+      } else {
+        console.error("Failed to create user:", response.status, response.statusText);
+      }
+    } catch (error) {
+      console.error("An error occurred during user creation:", error.message || error);
+    }
+  };
+
   const onSubmit = async (values) => {
     console.log(values)
+    if (isLogin) {
+      await submitLogin(values)
+    } else {
+      await submitUserCreation(values)
+    }
   }
 
   const handleForgotPassword = async (values) => {
@@ -91,19 +160,6 @@ export function AuthPage() {
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
               {!isLogin && (
                 <>
-                  <FormField
-                    control={form.control}
-                    name="name"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Name</FormLabel>
-                        <FormControl>
-                          <Input placeholder="John Doe" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
                   <FormField
                     control={form.control}
                     name="username"
