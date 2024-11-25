@@ -3,6 +3,7 @@ import { connect } from 'mongoose';
 import { config } from 'dotenv';
 
 import userRoutes from './routes/userRoutes.js';
+import authRoutes from './routes/authRoutes.js';
 
 config();
 const app = express();
@@ -25,6 +26,7 @@ const connectDB = async () => {
 
 connectDB();
 
+app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 
 app.get('/', (req, res) => {

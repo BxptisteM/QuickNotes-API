@@ -2,6 +2,8 @@ import User from '../models/User.js';
 import express from 'express';
 import pkg from 'bcryptjs'
 import { checkEmailValidity, validateUsername } from '../utils/validations.js';
+import authenticate from '../middleware/authMiddleware.js';
+import jwt from 'jsonwebtoken';
 
 const router = express.Router();
 const { hash, compare } = pkg;
@@ -16,16 +18,24 @@ router.post('/register', async (req, res) => {
             return res.status(400).json({ message: 'Invalid email' });
         }
 
+        const existingUser = await User.findOne({ email });
+        if (existingUser) {
+            return res.status(409).json({ message: 'Email already in use' });
+        }
+
         const hashedPassword = await hash(password, 10);
         const newUser = new User({ username, email, password: hashedPassword });
         await newUser.save();
-        res.status(201).json({ message: 'User registered successfully' });
+
+        const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET, { expiresIn: '24h' });
+
+        res.status(201).json({ message: 'User registered successfully', token });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
 });
 
-router.patch('/update/:id', async (req, res) => {
+router.patch('/update/:id', authenticate, async (req, res) => {
     const { id } = req.params;
     const { username, email, password } = req.body;
 
@@ -70,7 +80,7 @@ router.patch('/update/:id', async (req, res) => {
 });
 
 
-router.delete('/delete/:id', async (req, res) => {
+router.delete('/delete/:id', authenticate, async (req, res) => {
     const { id } = req.params;
 
     try {
@@ -87,7 +97,7 @@ router.delete('/delete/:id', async (req, res) => {
     }
 });
 
-router.get('/', async (req, res) => {
+router.get('/', authenticate, async (req, res) => {
     try {
         const users = await User.find();
         res.status(200).json({ users });
@@ -96,7 +106,7 @@ router.get('/', async (req, res) => {
     }
 });
 
-router.get('/:id', async (req, res) => {
+router.get('/:id', authenticate, async (req, res) => {
     const { id } = req.params;
 
     try {
