@@ -26,7 +26,7 @@ export default function NotesPage() {
 
       try {
         const decodedToken = jwtDecode(token);
-        setUserId(decodedToken.id); // Assurez-vous que l'ID est bien sous la clé `id`
+        setUserId(decodedToken.id);
       } catch (error) {
         console.error('Error decoding JWT:', error);
       }
