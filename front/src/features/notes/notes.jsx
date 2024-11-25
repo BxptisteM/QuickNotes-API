@@ -7,6 +7,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card"
 import { getApiClient } from "@/common/api/client"
 import { PlusIcon, Pencil, Trash } from 'lucide-react'
+import { jwtDecode } from 'jwt-decode';
 
 export default function NotesPage() {
   const [notes, setNotes] = useState([])
@@ -14,15 +15,23 @@ export default function NotesPage() {
   const [content, setContent] = useState('')
   const [editingId, setEditingId] = useState(null)
   const [apiClient, setApiClient] = useState(null)
+  const [userId, setUserId] = useState(null)
 
   useEffect(() => {
-    const token = localStorage.getItem('token')
+    const token = localStorage.getItem('token');
     if (token) {
-      const client = getApiClient()
-      client.setAccessToken(token)
-      setApiClient(client)
+      const client = getApiClient();
+      client.setAccessToken(token);
+      setApiClient(client);
+
+      try {
+        const decodedToken = jwtDecode(token);
+        setUserId(decodedToken.id); // Assurez-vous que l'ID est bien sous la clé `id`
+      } catch (error) {
+        console.error('Error decoding JWT:', error);
+      }
     }
-  }, [])
+  }, []);
 
   useEffect(() => {
     if (apiClient) {
@@ -41,19 +50,24 @@ export default function NotesPage() {
   }
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
-    try {
-      const url = editingId ? `api/ideas/${editingId}` : 'api/ideas'
-      const method = editingId ? apiClient.patch : apiClient.post
-      await method(url, { title, content })
-      fetchNotes()
-      setTitle('')
-      setContent('')
-      setEditingId(null)
-    } catch (error) {
-      console.error('Error saving note:', error)
+    e.preventDefault();
+    if (!apiClient) {
+      console.error("API client is not initialized.");
+      return;
     }
-  }
+
+    try {
+      const url = editingId ? `api/ideas/${editingId}` : 'api/ideas';
+      const method = editingId ? apiClient.patch.bind(apiClient) : apiClient.post.bind(apiClient);
+      await method(url, { title, content });
+      fetchNotes();
+      setTitle('');
+      setContent('');
+      setEditingId(userId);
+    } catch (error) {
+      console.error('Error saving note:', error);
+    }
+  };
 
   const handleEdit = (note) => {
     setTitle(note.title)
@@ -73,7 +87,7 @@ export default function NotesPage() {
   return (
     <div className="container mx-auto p-4">
       <h1 className="text-3xl font-bold mb-6">My Notes</h1>
-      
+
       <form onSubmit={handleSubmit} className="mb-8">
         <Card>
           <CardHeader>

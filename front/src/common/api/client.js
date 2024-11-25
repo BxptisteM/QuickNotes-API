@@ -61,9 +61,9 @@ class ApiClient {
     return this.request(endpoint, "GET", undefined, headers);
   }
 
-  post(endpoint, body, headers, isFormData = false) {
+  post = (endpoint, body, headers, isFormData = false) => {
     return this.request(endpoint, "POST", body, headers, isFormData);
-  }
+  };
 
   put(endpoint, body, headers, isFormData = false) {
     return this.request(endpoint, "PUT", body, headers, isFormData);
@@ -73,13 +73,13 @@ class ApiClient {
     return this.request(endpoint, "DELETE", undefined, headers);
   }
 
-  patch(endpoint, body, headers = {}, isFormData = false) {
+  patch = (endpoint, body, headers = {}, isFormData = false) => {
     return this.request(endpoint, "PATCH", body, headers, isFormData);
-  }
+  };
 }
 
 export function getApiClient() {
-  const token = localStorage.getItem(accessTokenKey);
+  const token = localStorage.getItem('token');
   const apiClient = new ApiClient("http://localhost:5000");
   if (token) {
     apiClient.setAccessToken(token);
