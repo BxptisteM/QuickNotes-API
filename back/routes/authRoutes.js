@@ -1,8 +1,10 @@
 import jwt from 'jsonwebtoken';
 import User from '../models/User.js';
 import express from 'express';
+import pkg from 'bcryptjs';
 
 const router = express.Router();
+const { compare, hash } = pkg;
 
 router.post('/login', async (req, res) => {
     const { email, password } = req.body;
