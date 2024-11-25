@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const ideaSchema = new mongoose.Schema({
     title: {
@@ -20,4 +20,6 @@ const ideaSchema = new mongoose.Schema({
     timestamps: true,
 });
 
-module.exports = mongoose.model('Idea', ideaSchema);
+const Idea = mongoose.model('Idea', ideaSchema);
+
+export default Idea;

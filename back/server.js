@@ -5,6 +5,7 @@ import cors from 'cors';
 
 import userRoutes from './routes/userRoutes.js';
 import authRoutes from './routes/authRoutes.js';
+import ideaRoutes from './routes/ideaRoutes.js';
 
 config();
 const app = express();
@@ -37,6 +38,7 @@ app.use(
 
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/ideas', ideaRoutes);
 
 app.get('/', (req, res) => {
     res.send('Hello World!');
