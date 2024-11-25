@@ -12,10 +12,9 @@ router.post('/register', async (req, res) => {
     const { username, email, password } = req.body;
 
     try {
-        const validEmail = await checkEmailValidity(email);
-
+        const validEmail = checkEmailValidity(email);
         if (!validEmail) {
-            return res.status(400).json({ message: 'Invalid email' });
+            return res.status(400).json({ message: 'Invalid email format' });
         }
 
         const existingUser = await User.findOne({ email });

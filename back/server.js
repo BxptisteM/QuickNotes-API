@@ -1,6 +1,7 @@
 import express, { json } from 'express';
 import { connect } from 'mongoose';
 import { config } from 'dotenv';
+import cors from 'cors';
 
 import userRoutes from './routes/userRoutes.js';
 import authRoutes from './routes/authRoutes.js';
@@ -25,6 +26,14 @@ const connectDB = async () => {
 };
 
 connectDB();
+
+app.use(
+    cors({
+      origin: "http://localhost:5173",
+      methods: ["GET", "POST", "PUT", "DELETE"],
+      credentials: true,
+    })
+  );
 
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
