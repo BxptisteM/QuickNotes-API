@@ -1,6 +1,6 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from '@/features/authentification/hooks/auth.hook.jsx';
-import { AuthenticationPage } from '@/features/authentification/auth.jsx';
+import { AuthPage } from '@/features/authentification/auth.jsx';
 
 export const AppRoutes = () => {
   const { isAuthenticated, loading} = useAuth();
@@ -11,7 +11,7 @@ export const AppRoutes = () => {
 
   return (
     <Routes>
-      <Route path="/" element={<AuthenticationPage/>} />
+      <Route path="/" element={<AuthPage/>} />
 
       {isAuthenticated ? (
         <Route path="*" element={<Navigate to="/app" />} />
